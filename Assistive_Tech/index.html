@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<head>
+	<title>
+		Car game
+	</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<style type="text/css">
+		.table1{
+			border-style: solid;
+			border-width: 1px, 1px, 1px, 1px;
+			font-size: 40px;
+		}
+#header{
+	background-color: rgb(210, 210, 215);
+	font-size: 40px;
+	font-family: cursive;
+	text-align: center;
+	border: 10px solid black;
+	border-radius: 25px;
+	text-shadow: 1px 1px #909090;
+	margin: 5px;
+}
+body{
+	background-color:rgb(40, 240, 55);
+}
+.text{
+	font-size: 24px;
+	padding: 10px;
+	margin: 10px;
+	display: inline;
+}
+#output{
+	font-size: 24px;
+	padding: 10px;
+	margin: 10px;
+}
+#subheader{
+	display: inline-block;
+	margin: auto;
+}
+.button{
+	font-size: 24px;
+	font-weight: bold;
+	margin: 10px;
+}
+.demo{
+	font-size: 60px;
+}
+.image{
+	text-align: center;
+	padding: 40px;
+	display: inline-block;
+	vertical-align: middle;
+	height: auto; 
+    width: auto; 
+    margin: auto;
+    max-width: 200px; 
+    max-height: 200px;
+}
+#topDiv{
+	margin: auto;
+}
+#output{
+	min-width: 850px;
+	min-height: 400px;
+	padding: 10px;
+	margin: 20px;
+}
+.input{
+	font-size: 24px;
+	width: 100px;
+	padding: 10px;
+	margin: 10px;
+	min-width: 400px;
+} 
+
+#submitButton{
+	font-size: 24px;
+	margin: 20px;
+}
+#clearButton{
+	margin: auto;
+}
+#reference{
+	padding: 10px;		
+	text-align:center;
+	font-size: 34px;
+	opacity: 1;
+	margin-top: 20px;
+}
+#canvas{
+			border:1px black solid;
+			background-color: #FFFFFF
+		}
+	</style>
+	<script type="text/javascript">
+		var canvas;
+		var timer = null;
+		var paused = false;
+		var x = 0;
+		var y = 600;
+		var width = 80;
+		var height = 24;
+		var wheelRadius = 10;
+		window.onload=function(){
+			canvas = document.getElementById("canvas");
+			context = canvas.getContext('2d');
+			document.addEventListener("keydown", keyDownListener, false);
+			timer = window.setInterval(repaint, 10);
+		}
+		function keyDownListener(evt){
+		    if(evt.keyCode == 32){
+				paused = !paused
+			}
+		    repaint();
+		}
+		function repaint(){
+		    clearCanvas()
+		    if(!paused){
+		        x += 1;
+		        if(x == canvas.width){
+		            x = 0-width;
+		        }
+		    }
+		    context.lineWidth = 1
+			context.globalAlpha=1;
+			context.strokeStyle = "#000000";
+			context.fillStyle = "#000000"
+			context.fillRect(x+(width/4), y-(height), width/4, height)
+			context.fillRect(x+(width/2), y-(height), width/4, height)
+ 
+		    context.fillRect(x, y, width, height)
+            
+            context.beginPath();
+			context.arc(x+(width/6), y+(height), wheelRadius, 0  , 2*Math.PI);
+			context.arc(x+(5*width/6), y+(height), wheelRadius, 0  , 2*Math.PI);
+			context.closePath();
+	        context.fill();
+			context.stroke();
+		}
+		function clearCanvas(){
+		    context.fillStyle = "#FFFFFF"
+		    context.fillRect(0, 0, canvas.width,canvas.height);
+		}
+	</script>
+</head>
+<body>
+	<div id = "header">
+		<p style = "color: red;">Amit Joshi Assistive Technology Club Car Game</p>
+	</div>
+	<div id = "topDiv">
+		<center>
+				<h1 id = "subheader">Car Training Game:</h1>
+		</center>
+		<center>
+			<div class = "text">
+				Canvas:
+			</div>
+			<div>
+				<canvas id = "canvas" width="900" height="700">
+		
+				</canvas>
+			</div>
+		</center>
+	</div>
+	<div>
+		<button id = "clearButton" onclick = "clearCanvas()">Clear Canvas</button>
+	</div>
+</body>
+</html>

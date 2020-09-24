@@ -1,0 +1,137 @@
+#!/usr/bin/nodejs
+var PythonShell = require('python-shell');
+var express = require('express');
+var bodyParser = require('body-parser')
+var contentDisposition = require('content-disposition')
+var destroy = require('destroy')
+var onFinished = require('on-finished')
+var fs = require('fs')
+var path = require('path');
+//var http = require('http').Server(app);
+var fileUpload = require('express-fileupload');
+var app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+
+// -------------- express initialization -------------- //
+
+// Here, we set the port (these settings are specific to our site)
+app.set('port', process.env.PORT || 8080 );
+app.use(fileUpload());
+function decode(message, password){
+    console.log("in decode")
+    var pyshell = new PythonShell('d.py');
+    pyshell.send(password);
+    pyshell.on('message', function (message) {
+      // received a message sent from the Python script (a simple "print" statement) 
+        console.log(message);
+        //res.send(message);
+    });
+}
+function deleteFile (file) { 
+    fs.unlink(file, function (err) {
+        if (err) {
+            console.error(err.toString());
+        } else {
+            console.warn(file + ' deleted');
+        }
+    });
+}
+function justSendSomething(res){
+    res.send("encoded.png")
+}
+function encode(message, password, beforeName, res) {
+    console.log("in encode");
+    var pyshell = new PythonShell('e.py');
+    
+    // sends a message to the Python script via stdin
+    //console.log(beforeName.toString());
+    pyshell.send(beforeName);
+    pyshell.send(message);
+    pyshell.send(password);
+    fileName = "wrongwrongwrong";
+    counter = 0;
+    pyshell.on('message', function (message) {
+      // received a message sent from the Python script (a simple "print" statement) 
+        counter += 1;
+        fileName = message
+        res.send(fileName)
+    });
+    console.log(fileName);
+     
+    // end the input stream and allow the process to exit 
+    pyshell.end(function (err) {
+      if (err){
+          throw err;
+      }
+      filePath = __dirname + '/' + fileName;
+      console.log('finished encoding');
+      //res.setHeader('Content-Type', 'image/png')
+      //res.setHeader('Content-Disposition', contentDisposition(filePath))
+ 
+
+      res.send(fileName)
+            // send file 
+      /*var stream = fs.createReadStream(filePath)
+        stream.pipe(res).once("close", function () {
+            stream.destroy(); // makesure stream closed, not close if download aborted.
+            //deleteFile(filename);
+        });*/
+      //res.sendFile(__dirname + '/' + fileName)
+    });
+    
+}
+
+
+var listener = app.listen(app.get('port'), function() {
+  console.log("server running")
+  console.log( 'Express server started on port: '+listener.address().port );
+});
+
+app.get('/', function(req, res){
+  res.sendFile(__dirname + '/index.html');
+  
+});
+var getImageListener = app.get('/getImage', function(req, res){
+    fileName = req.query.fileName;
+    res.sendFile(__dirname + '/' + fileName);
+    //res.sendFile(__dirname + "/" + "doesn'texist")
+    
+});
+var decodingListener = app.get('/decodeMessage', function(req, res){
+   password = req.query.password; 
+   decodedMessage = decode(password);
+   res.send(decodedMessage)
+});
+
+var encodingListener = app.post('/encodeMessage', function(req, res){
+    if (!req.files) {
+        return res.status(400).send('no file uploaded');
+    }
+    message = req.body.message;
+    password = req.body.password;
+    var vessel = req.files.vessel;
+    if (message === null || password === null || vessel === null){
+        return res.status(400).send("um why")
+    }
+    var image_file_name = vessel.name;
+    var image_file_ext  = path.extname(image_file_name);
+
+    // construct complete file path
+    
+    
+    d = new Date();
+    t = d.getTime();
+    var date_stamp = t.toString();
+    var file_string = 'date_' + date_stamp + image_file_ext; 
+    image_file_path = path.join(__dirname, file_string );
+    fs.writeFile(image_file_path, vessel, function (err) {
+          if (err){
+              res.send("couldnt save file")
+          }
+          console.log('Saved!' + beforeName.toString());
+          
+        });
+    justSendSomething(res)  
+    //encode(message, password, file_string, res);
+    //res.send("maybe success");
+});

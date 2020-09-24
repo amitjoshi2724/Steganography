@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>
+        Final Lab
+    </title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style type="text/css">
+        body{
+            /*text-align: center;*/
+            background: linear-gradient(90deg, #000000 10%, #00ddff 30%, #000000 50%, #00ddff 70%, #000000 90%);
+        }
+        #countdown{
+            text-align: center;
+           background-image: linear-gradient(to top, #8E42FF 0%, #1b1b1b 100%);
+            color: white;
+            font-size: 50px;
+        }
+        a{
+            /*color:  linear-gradient(90deg, #000000 10%, #00ddff 30%, #000000 50%, #00ddff 70%, #000000 90%);*/
+            color: white;
+            text-decoration: none;
+        }
+        a:hover{
+            color: white;
+            text-decoration: none;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        /* Hide default HTML checkbox */
+        
+        .switch input {
+            display: none;
+        }
+        /* The slider */
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+        
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
+        
+        input:focus+.slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+        
+        input:checked+.slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+        /* Rounded sliders */
+        
+        .slider.round {
+            border-radius: 34px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+        
+        .table1 {
+            border-style: solid;
+            border-width: 1px, 1px, 1px, 1px;
+            font-size: 40px;
+        }
+        
+        #canvas {
+            text-align: center;
+            position: relative;
+            margin: auto;
+            left: 10%;
+            border: 1px black solid;
+            background-color: #FFFFFF
+        }
+        
+        #inputs {
+            background: #000;
+            padding: 3px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        
+        input {
+            border-radius: 5px;
+            padding: 10px;
+            width: 90%;
+            margin-right: .5%;
+        }
+        
+        #m {
+            border: 10px solid #DC143C;
+            background: linear-gradient(134deg, rgba(255, 122, 193, 1) 0%, rgba(0, 128, 128, 1) 100%);
+            /* w3c */
+        }
+        
+        #nickname {
+            border: 10px solid #00FFFF;
+            background: linear-gradient(134deg, rgba(0, 128, 128, 1) 0%, rgba(255, 122, 193, 1) 100%);
+            /* w3c */
+        }
+        
+        #roomname {
+            margin-top: 10px;
+            border: 10px solid #DC143C;
+            background: linear-gradient(134deg, rgba(255, 122, 193, 1) 0%, rgba(0, 128, 128, 1) 100%);
+            /* w3c */
+        }
+        
+        #roompassword {
+            /*margin-top: 10px;*/
+            border: 10px solid #00FFFF;
+            background: linear-gradient(134deg, rgba(0, 128, 128, 1) 0%, rgba(255, 122, 193, 1) 100%);
+            /* w3c */
+        }
+        
+        button {
+            width: 20%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+        
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #messages li {
+            padding: 5px 10px;
+        }
+        
+        #spacer {
+            padding: 10px;
+            width: 100%;
+            margin-right: .5%;
+        }
+        
+        h1 {
+            width: 9%;
+            background: rgb(130, 224, 255);
+            border: none;
+            padding: 10px;
+        }
+    </style>
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="https://rawgit.com/emn178/js-sha256/master/build/sha256.min.js"></script>
+    <script type="text/javascript">
+        class Snakey {
+            constructor(context, snakeNum, canvas, matrix, x, y) {
+                this.canvas = canvas;
+                this.matrix = matrix;
+                this.desire = 3 * Math.PI / 2;
+                this.snakeNum = snakeNum;
+                this.x = x;
+                this.y = y;
+                console.log(y)
+                this.speed = 1;
+                this.lost = false;
+                this.angle = 3 * Math.PI / 2
+                this.dx = Math.cos(this.angle) * this.speed;
+                this.dy = Math.sin(this.angle) * this.speed;
+            }
+            left() {
+                if (this.angle != 0) {
+                    this.desire = Math.PI;
+                    this.dx = Math.cos(this.angle) * this.speed;
+                    this.dy = Math.sin(this.angle) * this.speed;
+                }
+            }
+            up() {
+                if (this.angle != Math.PI / 2) {
+                    this.desire = 3 * Math.PI / 2;
+                    this.dx = Math.cos(this.angle) * this.speed;
+                    this.dy = Math.sin(this.angle) * this.speed;
+                }
+            }
+            down() {
+                if (this.angle != 3 * Math.PI / 2) {
+                    this.desire = Math.PI / 2;
+                    this.dx = Math.cos(this.angle) * this.speed;
+                    this.dy = Math.sin(this.angle) * this.speed;
+                }
+            }
+            right() {
+                if (this.angle != Math.PI) {
+                    this.desire = 0;
+
+                }
+            }
+            tick() {
+                this.angle = this.desire;
+                this.dx = Math.cos(this.angle) * this.speed;
+                this.dy = Math.sin(this.angle) * this.speed;
+                if (!this.lost) {
+                    this.x += this.dx;
+                    this.y += this.dy;
+                }
+                if (this.x < 0 || this.x > 120 || this.y < 0 || this.y > 80) {
+                    return [true, this.x, this.y];
+                }
+                return [false, this.x, this.y];
+            }
+            getX() {
+                return this.x;
+            }
+            getY() {
+                return this.y;
+            }
+            getSnakeNum() {
+                return this.snakeNum;
+            }
+            lose() {
+                this.lost = true;
+            }
+            getLost() {
+                return this.lost;
+            }
+        }
+        var snake1; //player snake
+        var snakeArray = []
+        var array = []; // 2d array
+        var canvas = null;
+        var count = 0
+        var host = false; //change later using socket.io, if first player, in onload change host to true
+        var timer = null;
+        var count = 0
+        var snakeNum = 1;
+        var socket = null;
+        var colorArray = ['white', 'red', 'blue', 'green', 'yellow'];
+        var context = null;
+        var matrix = null;
+        var currentRoom = null;
+        var isTicking = false;
+        var losers = [];
+        window.onload = function() {
+            matrix = new Array(120);
+            for (var i = 0; i < 120; i++) {
+                matrix[i] = new Array(80);
+            }
+            for (var i = 0; i < 120; i++) {
+                for (var j = 0; j < 80; j++) {
+                    matrix[i][j] = 0;
+                }
+            }
+            /**
+             * Socket
+             *
+             */
+            socket = io();
+            var clientSnake = null;
+            createRoom = function() {
+                var door = {
+                    roomname: $("#roomname").val(),
+                    key: sha256("" + $("#roompassword").val())
+                }
+                socket.emit('create room', door);
+            }
+            joinRoom = function() {
+                console.log("in join room")
+                var door = {
+                    roomname: $("#roomname").val(),
+                    key: sha256("" + $("#roompassword").val())
+                }
+                socket.emit('join room', door);
+            }
+            socket.on("server to client", function() {
+                if (host == false) {
+                    var clientData = {
+                        roomname: currentRoom,
+                        clientMatrix: matrix,
+                        clientPos: [snake1.getX(), snake1.getY()],
+                        clientNum: snake1.getSnakeNum()
+                    };
+                    socket.emit("client back to server", clientData);
+                }
+            });
+            socket.on("tick and update canvas", function(datapair) {
+                snake1.tick();
+                matrix[snake1.getX()][snake1.getY()] = snake1.getSnakeNum();
+                //console.log(matrix[snake1.getX()][snake1.getY()])
+                var result = snake1.tick();
+                if (result[0] || matrix[snake1.getX()][snake1.getY()] != 0) {
+                    snake1.lose();
+                }
+                else {
+                    matrix[snake1.getX()][snake1.getY()] = snake1.getSnakeNum();
+                }
+
+                updateCanvas(datapair);
+            })
+            socket.on('start play', function(string) {
+                console.log("in start play")
+
+                startPlay();
+            });
+            socket.on('chat message', function(msg) {
+
+                console.log(msg);
+
+            });
+
+
+            /**
+             * End Socket
+             *
+             */
+            canvas = document.getElementById("canvas");
+            context = canvas.getContext('2d');
+            context.globalAlpha = 1;
+            
+            
+            document.addEventListener("keydown", keyPressListener, false);
+            context.fillStyle = "#FFFFFF";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.fill();
+            context.stroke();
+            context.fillStyle = "#000000"
+            context.font = "30px Arial";
+            var str1 = ["How to Play:","1.Find a friend and enter a room name and password in the fields.","2.If you wish to host, click the toggle switch and hit start","3.If you wish to join a hosted game, wait until the host has hit start","4.When ready, the non-host should hit start.", "5. ENJOY! (Use arrow keys to turn)"]
+            var x;
+            for(x in str1){
+                context.fillText(str1[x], 30, 30+x*100)
+            }
+            context.fillText(s,30,30);
+            repaint()
+
+
+
+
+
+        }
+        joinOrCreateRoom = function() {
+            console.log("in join or create room");
+            currentRoom = $("#roomname").val();
+            if ($("#roomname").val() == "") {
+                return;
+            }
+            else if (host) {
+                createRoom();
+            }
+            else {
+                joinRoom();
+            }
+        }
+        sendMSG = function() {
+            var data = {
+                    msg: $("#nickname").val() + ": " + $('#m').val(),
+                    room: $("#roomname").val(),
+                    password: sha256("" + $("#roompassword").val())
+                }
+                //   console.log("Data: "+ data)
+            socket.emit('chat message', data);
+            $('#m').val('');
+            return false;
+        }
+
+        function toggleSwitch() {
+            count += 1
+            variable = $("#toggleInput").val()
+            if (variable == "on" && count < 3) {
+                host = true;
+            }
+            else {
+                host = false;
+            }
+            if (count == 4) {
+                count = 0
+            }
+        }
+
+        function startButtonPress() {
+            context.fillStyle = "#FFFFFF";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.fill();
+            context.stroke();
+            joinOrCreateRoom()
+            if (host) {
+                console.log("host started")
+            }
+        }
+
+        function keyPressListener(evt) {
+            if (evt.keyCode == 37) {
+                snake1.left();
+            }
+            else if (evt.keyCode == 39) {
+                snake1.right();
+            }
+            else if (evt.keyCode == 40) {
+                snake1.down();
+            }
+            else if (evt.keyCode == 38) {
+                snake1.up();
+            }
+        }
+
+        function startPlay() {
+            if (host) {
+                snake1 = new Snakey(context, snakeNum, canvas, matrix, 50, 40);
+                snakeNum += 1;
+                snakeArray.push(snake1)
+                timer = window.setInterval(timerTick, 120);
+                isTicking = true;
+            }
+            else {
+                /* myNum = socket.getMyNum();
+                snake1 = new Snakey(context, myNum, canvas.width/2, canvas.height/2, canvas);
+                //below, add other snakes to snakeArray by getting from socket
+                */
+                //receive something from socket, snake1 = receive something
+                snake1 = new Snakey(context, 2, canvas, matrix, 60, 40);
+                socket.emit("first snake", -1);
+            }
+        }
+
+        function updateCanvas(datapair){
+               var hostMatrix = datapair[0];
+               var clientMatrix = datapair[1];
+               var hostPosition = datapair[2];
+               var clientPosition = datapair[3];
+               var hostLost = false;
+               var clientLost = false;
+               for(var i = 0; i < 120; i++){
+                   for(var j = 0; j < 80; j++){
+                       /*if(hostMatrix[i][j] != 0 && clientMatrix[i][j] != 0){
+                        if(hostPosition[0] == i && hostPosition[1] == j){
+                            hostLost = true;
+                        }
+                        else{
+                            clientLost = true;
+                        }
+                       }*/
+                       if(clientMatrix[i][j] != 0){
+                       matrix[i][j] = clientMatrix[i][j];
+                       }
+                       if(hostMatrix[i][j] != 0){
+                       matrix[i][j] = hostMatrix[i][j];
+                       }
+                   }
+               }
+              repaint();
+           }
+
+        function timerTick() {
+            if (host && isTicking) {
+                /*for(var i = 0; i < snakeArray.length; i++){
+                    var result = snakeArray[i].tick();
+                    if(result[0] || matrix[snakeArray[i].getX()][snakeArray[i].getY()] != 0){
+                        losers.push(snakeArray[i]);
+                        snakeArray[i].lose();
+                    }
+                    else{
+                     matrix[snakeArray[i].getX()][snakeArray[i].getY()] = snakeArray[i].getSnakeNum();
+                    }
+                }*/
+                var matrixData = {
+                    roomname: currentRoom,
+                    hostMatrix: matrix,
+                    hostPos: [snake1.getX(), snake1.getY()],
+                    hostNum: snake1.getSnakeNum()
+                };
+                socket.emit('host to server', matrixData);
+
+            }
+            else {
+                //do nothing if client;
+
+            }
+        }
+
+        function repaint() {
+            var paintX = 0;
+            var paintY = 0;
+            var paintX = 0;
+            var paintY = 0;
+            for (var i = 0; i < 120; i++) {
+                for (var j = 0; j < 80; j++) {
+                    context.fillStyle = colorArray[matrix[i][j]];
+                    if (context.fillStyle != '#ffffff') {
+                        context.fillRect(paintX, paintY, canvas.width / 120, canvas.width / 120);
+                        //console.log("did something");
+                        context.fill();
+                    }
+
+                    paintY += canvas.width / 120;
+                }
+                paintY = 0;
+                paintX += canvas.width / 120;
+            }
+            //console.log("repainted")
+            context.stroke();
+        }
+
+        function reset() {
+            if (host) {
+                window.clearInterval(timer);
+            }
+            snake1.reset()
+            matrix = new Array(120);
+            for (var i = 0; i < 120; i++) {
+                matrix[i] = new Array(80);
+            }
+            for (var i = 0; i < 120; i++) {
+                for (var j = 0; j < 80; j++) {
+                    matrix[i][j] = 0;
+                }
+            }
+
+        }
+    </script>
+</head>
+
+<body>
+    <canvas id="canvas" width="1000" height="600"></canvas></body>
+    <div id = "countdown">
+    </div>
+<div id="inputs">
+    <!--<div class = "row">
+              <div class="col-sm-4">
+              <input id="m" autocomplete="off" /><button onclick = "sendMSG()">Send</button>
+              </div>
+              <div class="col-sm-4">
+              <input type="text" id = "nickname"><button>Nickname</button><br>
+          </div>
+        </div>-->
+    <div class="row">
+        <div class="col-sm-4">
+            <input type="text" id="roomname"><button>Room Name</button>
+        </div>
+        <div class="col-sm-4">
+            <input type="password" id="roompassword"><button onclick="joinRoom">Password</button><br>
+        </div>
+        <div class="col-sm-4">
+            <button onclick="startButtonPress()">Start Game</button><br>
+            <button onclick="reset()">Reset</button><br>
+            <label onclick="toggleSwitch()" class="switch">
+              <input id= "toggleInput" type="checkbox">
+              <div class="slider round">Host?</div>
+            </label>
+        </div>
+        <!--<input type="text" class = "question"><button>test</button><br>-->
+
+    </div>
+</div>
+</body>
+
+</html>

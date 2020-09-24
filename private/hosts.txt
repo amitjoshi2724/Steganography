@@ -1,0 +1,3 @@
+localhost slots=8
+borg slots=3
+mario slots=3

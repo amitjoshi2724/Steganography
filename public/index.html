@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>
+        Amit Joshi Class of 2018 Research Project
+    </title>
+        <style type="text/css">
+        
+    #header{
+    	background-color: rgb(210, 210, 215);
+    	font-size: 40px;
+    	font-family: cursive;
+    	text-align: center;
+    	border: 10px solid black;
+    	border-radius: 25px;
+    	text-shadow: 1px 1px #909090;
+    	margin: 5px;
+    }
+    body{
+    	background-color:rgb(200,200, 150);
+    }
+    .text{
+    	font-size: 24px;
+    	padding: 10px;
+    	margin: 10px;
+    	display: inline;
+    }
+    #subheader{
+    	display: inline-block;
+    	margin: auto;
+    }
+    .image{
+    	text-align: center;
+    	padding: 40px;
+    	display: inline-block;
+    	vertical-align: middle;
+    	height: auto; 
+        width: auto; 
+        margin: auto;
+        max-width: 300px; 
+        max-height: 300px;
+    }
+    .highlight{
+    	background: rgba(255, 230, 0, 0.5);
+    	display: inline-block;
+    }
+    #topDiv{
+    	margin: auto;
+    }
+    .input{
+    	font-size: 24px;
+    	width: 200px;
+    	padding: 10px;
+    	margin: 10px;
+    	text-align: center;
+    } 
+    
+    .fileInput{
+        font-size: 16px;
+        width: 300px;
+        padding: 10px;
+        margin: 10px;
+        text-align: center;
+    }
+    #submitButton{
+    	font-size: 24px;
+    	padding: 5px;
+    }
+    #resetButton{
+    	font-size: 24px;
+    	padding: 5px;
+    }
+    #reference{
+    	padding: 10px;		
+    	text-align:center;
+    	font-size: 34px;
+    	opacity: 1;
+    	margin-top: 20px;
+    }
+            #inputs {
+                background: #000;
+                padding: 3px;
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+            }
+            
+            input {
+                border-radius: 5px;
+                padding: 10px;
+                width: 90%;
+                margin-right: .5%;
+            }
+            
+            
+            #roomname {
+                margin-top: 10px;
+                border: 10px solid #DC143C;
+                background: linear-gradient(134deg, rgba(255, 122, 193, 1) 0%, rgba(0, 128, 128, 1) 100%);
+                /* w3c */
+            }
+            
+            #roompassword {
+                /*margin-top: 10px;*/
+                border: 10px solid #00FFFF;
+                background: linear-gradient(134deg, rgba(0, 128, 128, 1) 0%, rgba(255, 122, 193, 1) 100%);
+                /* w3c */
+            }
+            
+            button {
+                width: 20%;
+                background: rgb(130, 224, 255);
+                border: none;
+                padding: 10px;
+            }
+            
+            h1 {
+                width: 9%;
+                background: rgb(130, 224, 255);
+                border: none;
+                padding: 10px;
+            }
+    </style>
+     <script type="text/javascript">
+    var messageField = null;
+	var passwordField = null;
+	var vesselField = null;
+	var passwordFieldDecoding = null;
+	var nField = null;
+	var output = null;
+	var form = null;
+
+		window.onload=function(){
+		    form = document.getElementById("form")
+			messageField = document.getElementById("messageField")
+			passwordField = document.getElementById("passwordField")
+			passwordFieldDecoding = document.getElementById("passwordFieldDecoding")
+			vesselField = document.getElementById("vesselField")
+			output = document.getElementById("output")
+		}
+		function submitToServerDecode(){
+		    form_dom = document.getElementById("decoding_form");
+            formdata = new FormData(form_dom);
+            formdata.append("password", passwordFieldDecoding.value)
+                 console.log(formdata)
+            $.ajax({
+                url: "decodeMessage",  
+                type: 'POST',         
+                enctype: 'multipart/form-data',
+                data: formdata,
+                cache: false,
+                contentType: false,
+                processData: false
+            })
+            .done(function( data ) {
+                    data = String(data)
+                    alert( "Data Loaded: " + data)
+                    anchor.click();
+            });
+		}
+		function submitToServerEncode(){
+		   /*var jqxhr = $.post( "encodeMessage", { message: messageField.value, password: passwordField.value} )
+          .done(function( data ) {
+              //window.location = "getImage?fileName=" + data;
+                //location.replace("getImage?fileName=" + data);
+                var anchor = document.createElement('a');
+                anchor.href = "getImage?fileName=" + data;
+                anchor.target = "getImage?fileName=" + data;
+                anchor.download = data;
+                anchor.click();
+            //alert( "Data Loaded: " + data );
+            
+              
+          });*/
+         /*var formData = new FormData();
+         formData.append("message", messageField.value)
+         formData.append("password", passwordField.value)
+         formData.append("vessel", vesselField.files[0]);*/
+         
+    form_dom = document.getElementById("form");
+    formdata = new FormData(form_dom);
+    formdata.append("message", messageField.value)
+    formdata.append("password", passwordField.value)
+         //console.log(formdata)
+        $.ajax({
+            url: "encodeMessage",  
+            type: 'POST',         
+            enctype: 'multipart/form-data',
+            data: formdata,
+            cache: false,
+            contentType: false,
+            processData: false
+        })
+        .done(function( data ) {
+                var anchor = document.createElement('a');
+                data = String(data)
+                console.log("My data is: " + data)
+                anchor.href = "getImage?fileName=" + data;
+                //anchor.target = "getImage?fileName=" + data;
+                //anchor.download = data;
+                //anchor.download = "newimage.png"
+                anchor.download = data.substring(0, data.length-1)
+                anchor.click();
+              });
+        
+          /*$.ajax({
+              method: "POST",
+              url: "encodeMessage",
+              processData: "false",
+              //contentType: 'multipart/form-data',
+              enctype: 'multipart/form-data',
+              //data: { message: messageField.value, password: passwordField.value, vessel: vesselField.file}
+                data: form.serializeArray(),
+                dataType: "json"
+              
+          })
+              .done(function( data ) {
+                var anchor = document.createElement('a');
+                anchor.href = "getImage?fileName=" + data;
+                anchor.target = "getImage?fileName=" + data;
+                anchor.download = data;
+                anchor.click();
+              });
+        */
+        
+			/*var xhttp = new XMLHttpRequest();
+			var params = "message="+messageField.value+"&password="+passwordField.value;
+			console.log(params);
+			xhttp.onreadystatechange = function() {
+    			if (this.readyState == 4 && this.status == 200) {
+    				response = this.responseText;
+    				reset();
+    				arr = response.split(" ");
+    				output.innerHTML = output.innerHTML + response;
+    				output.value = output.value + response;
+    			}	
+  			};
+  			
+  			var url = "index.js/" + params;
+  			xhttp.open("GET", url, true);
+ 			xhttp.send();*/
+		}
+		function reset(){
+		    console.log("here")
+			console.log("resetting")
+			output.value = "Possible Words: "
+			output.innerHTML = ""
+		}
+     </script>
+</head>
+<body>
+    <div id = "header">
+		<p style = "color: red;">Amit Joshi Senior Research Project</p>
+	</div>
+	<div id = "topDiv">
+		<center>
+			<h1 id = "subheader">Steganography</h1>
+		</center>
+	</div>
+	<div>
+		<left>
+		    <h2 id = "subheader">Encoding</h2>
+			<form enctype="multipart/form-data" id = "form">
+                <div>
+		            <p class= "text" style="text-align:left">Enter message to be encoded:</p>
+		            <input id = "messageField" class= "input" style="text-align:left" type = "text">
+		        </div>
+		        <div>
+		            <p class= "text" style="text-align:left">Enter password, if you wish to:</p>
+		            <input id = "passwordField" class= "input" style="text-align:left" type = "text">
+		        </div>
+				<div>
+				    <p class = "text" style="text-align:left">Choose vessel image:</p>
+				    <input id = "vesselField" name = "vessel" class = "fileInput" style="text-align:left" type = "file">
+				</div>
+				<input id = "submitButton" type="submit" onclick = "submitToServerEncode(); return false;">
+				<input id = "resetButton" type="reset">
+			</form>
+		</left>
+		<right>
+		    <h2 id = "subheader">Decoding</h2>
+		    <form enctype="multipart/form-data" id = "decoding_form">
+		        
+				<div>
+					<p class = "text" style="text-align:left">Enter password, if you wish to:</p>
+					<input id = "passwordFieldDecoding" class = "input" style="text-align:left" type = "text">
+				</div>
+				<div>
+				    <p class = "text" style="text-align:left">Choose vessel image:</p>
+				    <input id = "vesselFieldDecoding" name = "vessel" class = "fileInput" style="text-align:left" type = "file">
+				</div>
+				<input id = "submitButton" type="submit" onclick = "submitToServerDecode();return false;">
+				<input id = "resetButton" type="reset">
+			</form>
+		</right>
+	</div>
+</body>
+</html>
